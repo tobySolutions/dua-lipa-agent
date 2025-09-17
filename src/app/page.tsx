@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState, useRef } from "react";
 import { FaUtensils, FaMusic, FaRegSmile, FaBed, FaHeart } from "react-icons/fa";
+import ReactMarkdown from "react-markdown";
 
 export default function Home() {
   // Status states
@@ -10,9 +11,16 @@ export default function Home() {
   const [energy, setEnergy] = useState(60);
   const [message, setMessage] = useState("Welcome to Dua Lipa Agent!");
   const [chatInput, setChatInput] = useState("");
+  const [isNapping, setIsNapping] = useState(false);
   const [chatMessages, setChatMessages] = useState<{ role: string; content: string; face?: boolean }[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Helper to clean AI response by removing think tags
+  const cleanAIResponse = (text: string) => {
+    // Remove <think>...</think> tags and their content
+    return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+  };
 
   // Helper to send prompt to AI
   const sendPrompt = async (prompt: string, systemPrompt?: string) => {
@@ -35,13 +43,15 @@ export default function Home() {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        aiMsg += new TextDecoder().decode(value);
+        const chunk = new TextDecoder().decode(value);
+        aiMsg += chunk;
+        const cleanedMsg = cleanAIResponse(aiMsg);
         setChatMessages(msgs => {
           const last = msgs[msgs.length - 1];
           if (last?.role === "assistant") {
-            return [...msgs.slice(0, -1), { role: "assistant", content: aiMsg, face: true }];
+            return [...msgs.slice(0, -1), { role: "assistant", content: cleanedMsg, face: true }];
           } else {
-            return [...msgs, { role: "assistant", content: aiMsg, face: true }];
+            return [...msgs, { role: "assistant", content: cleanedMsg, face: true }];
           }
         });
       }
@@ -106,30 +116,44 @@ Output format:
 
   // Action handlers
   const handleGirlDinner = () => {
+    if (isNapping) {
+      setIsNapping(false);
+      setMessage("Dua wakes up for Girl Dinner! 🍽️");
+    }
     setHunger(Math.min(hunger + 20, 100));
     setMessage("Girl Dinner! Dua enjoys crackers, cheese, and snacks.");
     sendPrompt("Dua, what is your favorite snack for Girl Dinner?");
   };
   const handleSing = () => {
+    if (isNapping) {
+      setIsNapping(false);
+      setMessage("Dua wakes up ready to sing! 🎤");
+    }
     setHappiness(Math.min(happiness + 15, 100));
     setMessage("🎤 Dua sings: 'Levitating, I'm levitating!' (sample lyric)");
     sendPrompt("Dua, can you sing a snippet from one of your top songs?");
   };
   const handleHug = () => {
+    if (isNapping) {
+      setIsNapping(false);
+      setMessage("Dua wakes up for a warm hug! 🤗");
+    }
     setHappiness(Math.min(happiness + 10, 100));
     setMessage("You gave Dua a hug. She feels calm and poised.");
     sendPrompt("Dua, how do you feel after a hug?");
   };
   const handleNap = () => {
     setEnergy(Math.min(energy + 25, 100));
-    setMessage("Dua is taking a nap. Shh...");
+    setMessage("💤 Dua Lipa is sleeping peacefully... Shh!");
+    setIsNapping(true);
     sendPrompt("Dua, do you like to nap? What helps you recharge?");
   };
 
   const sendChat = async () => {
-    if (!chatInput.trim()) return;
-    await sendPrompt(chatInput);
-    setChatInput("");
+    if (!chatInput.trim() || isNapping) return;
+    const userMessage = chatInput;
+    setChatInput(""); // Clear input immediately
+    await sendPrompt(userMessage);
   };
 
   return (
@@ -204,14 +228,6 @@ Output format:
                 </h2>
                 <div className="flex-1 flex flex-col-reverse overflow-y-scroll px-2 sm:px-6 md:px-8 mb-0 scrollbar-thin scrollbar-thumb-pink-300 scrollbar-track-purple-100 pb-[80px]" style={{ minHeight: '0', maxHeight: '260px' }}>
                   <div>
-                    {chatLoading && (
-                      <div className="flex items-center gap-2 mb-3 animate-fade-in">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 relative rounded-full overflow-hidden border-2 border-purple-400 bg-white flex items-center justify-center shadow-lg">
-                          <Image src="/dua_lipa.png" alt="Dua Lipa tiny face" fill sizes="32px,40px" className="object-cover" />
-                        </div>
-                        <span className="text-purple-700 font-semibold text-base sm:text-lg animate-pulse">Dua Lipa is typing...</span>
-                      </div>
-                    )}
                     {chatMessages.map((msg, i) => (
                       <div key={i} className={`p-3 sm:p-4 rounded-2xl flex items-center gap-2 sm:gap-4 mb-2 sm:mb-3 transition-all duration-300 ${msg.role === "user" ? "bg-gradient-to-r from-pink-100 to-pink-200 justify-end" : "bg-gradient-to-r from-purple-50 to-indigo-100 justify-start"} shadow-lg animate-fade-in`}> 
                         {msg.role === "assistant" ? (
@@ -221,26 +237,36 @@ Output format:
                         ) : (
                           <FaRegSmile className="text-pink-500 w-7 h-7 sm:w-8 sm:h-8" />
                         )}
-                        <div className="text-sm sm:text-base whitespace-pre-line text-purple-900 max-w-[70%] markdown-message font-medium animate-fade-in" dangerouslySetInnerHTML={{ __html: msg.content }} />
+                        <div className="text-sm sm:text-base text-purple-900 max-w-[70%] markdown-message font-medium animate-fade-in">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
                       </div>
                     ))}
+                    {chatLoading && (
+                      <div className="flex items-center gap-2 mb-3 animate-fade-in">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 relative rounded-full overflow-hidden border-2 border-purple-400 bg-white flex items-center justify-center shadow-lg">
+                          <Image src="/dua_lipa.png" alt="Dua Lipa tiny face" fill sizes="32px,40px" className="object-cover" />
+                        </div>
+                        <span className="text-purple-700 font-semibold text-base sm:text-lg animate-pulse">Dua Lipa is typing...</span>
+                      </div>
+                    )}
                     <div ref={chatEndRef} />
                   </div>
                 </div>
                 <form className="absolute bottom-0 left-0 right-0 bg-white/95 flex gap-2 sm:gap-4 px-2 sm:px-6 md:px-8 pb-2 sm:pb-6 pt-2 z-20 border-t border-purple-100" style={{ boxShadow: '0 -2px 16px 0 rgba(236, 72, 153, 0.08)' }} onSubmit={e => { e.preventDefault(); sendChat(); }}>
                   <input
-                    className="flex-1 rounded-2xl border-2 border-purple-300 px-2 sm:px-5 py-2 sm:py-4 text-sm sm:text-lg focus:outline-none text-purple-900 bg-purple-50 shadow-lg font-medium transition-all duration-200 focus:ring-4 focus:ring-purple-200"
+                    className={`flex-1 rounded-2xl border-2 border-purple-300 px-2 sm:px-5 py-2 sm:py-4 text-sm sm:text-lg focus:outline-none text-purple-900 shadow-lg font-medium transition-all duration-200 focus:ring-4 focus:ring-purple-200 ${isNapping ? 'bg-gray-200 cursor-not-allowed' : 'bg-purple-50'}`}
                     type="text"
-                    placeholder="Ask Dua Lipa anything..."
+                    placeholder={isNapping ? "Dua is napping... Shh!" : "Ask Dua Lipa anything..."}
                     value={chatInput}
                     onChange={e => setChatInput(e.target.value)}
-                    disabled={chatLoading}
+                    disabled={chatLoading || isNapping}
                   />
                   <button
-                    className="rounded-2xl bg-gradient-to-r from-pink-500 to-pink-400 text-white px-3 sm:px-8 py-2 sm:py-4 font-bold shadow-xl hover:scale-105 hover:bg-pink-600 text-sm sm:text-xl border-2 border-pink-300 focus:ring-4 focus:ring-pink-200 transition-all duration-200"
+                    className={`rounded-2xl text-white px-3 sm:px-8 py-2 sm:py-4 font-bold shadow-xl text-sm sm:text-xl border-2 transition-all duration-200 ${isNapping ? 'bg-gray-400 border-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-pink-500 to-pink-400 border-pink-300 hover:scale-105 hover:bg-pink-600 focus:ring-4 focus:ring-pink-200'}`}
                     type="submit"
-                    disabled={chatLoading || !chatInput.trim()}
-                  >Send</button>
+                    disabled={chatLoading || !chatInput.trim() || isNapping}
+                  >{isNapping ? "💤" : "Send"}</button>
                 </form>
               </div>
             </div>
