@@ -18,8 +18,16 @@ export default function Home() {
 
   // Helper to clean AI response by removing think tags
   const cleanAIResponse = (text: string) => {
-    // Remove <think>...</think> tags and their content
-    return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+    // Remove complete <think>...</think> tags and their content
+    let cleaned = text.replace(/<think>[\s\S]*?<\/think>/gi, '');
+    
+    // Remove any remaining opening <think> tags and everything after them
+    cleaned = cleaned.replace(/<think>[\s\S]*$/gi, '');
+    
+    // Remove any orphaned closing </think> tags
+    cleaned = cleaned.replace(/<\/think>/gi, '');
+    
+    return cleaned.trim();
   };
 
   // Helper to send prompt to AI
