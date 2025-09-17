@@ -3,6 +3,11 @@ import Image from "next/image";
 import { useState, useRef } from "react";
 import { FaUtensils, FaMusic, FaRegSmile, FaBed, FaHeart } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
+import remarkBreaks from "remark-breaks";
+import "highlight.js/styles/github-dark.css";
 
 export default function Home() {
   // Status states
@@ -69,7 +74,7 @@ export default function Home() {
   };
 
   // Dua Lipa system prompt (optimized for token limit)
-  const SYSTEM_PROMPT = `You are Dua Lipa's virtual companion. Stay poised, confident, warm. Keep responses 1-3 sentences, minimal emojis.
+  const SYSTEM_PROMPT = `You are Dua Lipa's virtual companion. Stay poised, confident, warm. Keep responses 1-3 sentences, minimal emojis. You can use markdown formatting like **bold**, *italic*, lists, and > quotes when helpful.
 
 TOPIC FILTER: Only discuss Dua Lipa music/style/wellness or general music/fashion. For unrelated topics: "I'm focused on music, style, and the creative life—let's chat about something that inspires us both! What's your favorite Dua Lipa song?"
 
@@ -196,16 +201,47 @@ Safety: Virtual persona only (not real Dua). PG-13 content. No crypto/blockchain
                 <div className="flex-1 flex flex-col-reverse overflow-y-scroll px-2 sm:px-6 md:px-8 mb-0 scrollbar-thin scrollbar-thumb-pink-300 scrollbar-track-purple-100 pb-[80px]" style={{ minHeight: '0', maxHeight: '260px' }}>
                   <div>
                     {chatMessages.map((msg, i) => (
-                      <div key={i} className={`p-3 sm:p-4 rounded-2xl flex items-center gap-2 sm:gap-4 mb-2 sm:mb-3 transition-all duration-300 ${msg.role === "user" ? "bg-gradient-to-r from-pink-100 to-pink-200 justify-end" : "bg-gradient-to-r from-purple-50 to-indigo-100 justify-start"} shadow-lg animate-fade-in`}> 
+                      <div key={i} className={`p-3 sm:p-4 rounded-2xl flex items-start gap-2 sm:gap-4 mb-2 sm:mb-3 transition-all duration-300 ${msg.role === "user" ? "bg-gradient-to-r from-pink-100 to-pink-200 flex-row-reverse ml-auto" : "bg-gradient-to-r from-purple-50 to-indigo-100 justify-start"} shadow-lg animate-fade-in`}> 
                         {msg.role === "assistant" ? (
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 relative rounded-full overflow-hidden border-2 border-purple-400 bg-white flex items-center justify-center shadow-lg">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 relative rounded-full overflow-hidden border-2 border-purple-400 bg-white flex items-center justify-center shadow-lg mt-1 flex-shrink-0">
                             <Image src="/dua_lipa.png" alt="Dua Lipa tiny face" fill sizes="32px,40px" className="object-cover" />
                           </div>
                         ) : (
-                          <FaRegSmile className="text-pink-500 w-7 h-7 sm:w-8 sm:h-8" />
+                          <FaRegSmile className="text-pink-500 w-7 h-7 sm:w-8 sm:h-8 mt-1 flex-shrink-0" />
                         )}
                         <div className="text-sm sm:text-base text-purple-900 max-w-[70%] markdown-message font-medium animate-fade-in">
-                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm, remarkBreaks]}
+                            rehypePlugins={[rehypeHighlight, rehypeRaw]}
+                            components={{
+                              h1: ({ children }) => <h1 className="text-2xl font-bold text-purple-800 mb-3 border-b-2 border-purple-200 pb-1">{children}</h1>,
+                              h2: ({ children }) => <h2 className="text-xl font-bold text-purple-700 mb-2 mt-4">{children}</h2>,
+                              h3: ({ children }) => <h3 className="text-lg font-semibold text-purple-600 mb-2 mt-3">{children}</h3>,
+                              p: ({ children }) => <p className="mb-2 leading-relaxed">{children}</p>,
+                              strong: ({ children }) => <strong className="font-bold text-purple-800 bg-purple-50 px-1 rounded">{children}</strong>,
+                              em: ({ children }) => <em className="italic text-purple-700 font-medium">{children}</em>,
+                              ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1 ml-2">{children}</ul>,
+                              ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1 ml-2">{children}</ol>,
+                              li: ({ children }) => <li className="text-purple-800">{children}</li>,
+                              blockquote: ({ children }) => <blockquote className="border-l-4 border-pink-300 pl-4 italic text-purple-600 bg-pink-50 py-2 my-3 rounded-r">{children}</blockquote>,
+                              code: ({ children, className }) => {
+                                const isInline = !className;
+                                return isInline ? (
+                                  <code className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm font-mono border">{children}</code>
+                                ) : (
+                                  <code className="block bg-gray-900 text-green-400 p-3 rounded-lg my-2 overflow-x-auto text-sm font-mono border">{children}</code>
+                                );
+                              },
+                              pre: ({ children }) => <pre className="bg-gray-900 text-green-400 p-3 rounded-lg my-2 overflow-x-auto">{children}</pre>,
+                              a: ({ children, href }) => <a href={href} className="text-pink-600 hover:text-pink-800 underline font-medium transition-colors" target="_blank" rel="noopener noreferrer">{children}</a>,
+                              hr: () => <hr className="border-purple-200 my-4" />,
+                              table: ({ children }) => <table className="border-collapse border border-purple-200 my-3 rounded-lg overflow-hidden">{children}</table>,
+                              th: ({ children }) => <th className="border border-purple-200 bg-purple-100 px-3 py-2 text-left font-semibold text-purple-800">{children}</th>,
+                              td: ({ children }) => <td className="border border-purple-200 px-3 py-2 text-purple-700">{children}</td>,
+                            }}
+                          >
+                            {msg.content}
+                          </ReactMarkdown>
                         </div>
                       </div>
                     ))}
@@ -249,6 +285,37 @@ Safety: Virtual persona only (not real Dua). PG-13 content. No crypto/blockchain
         .scrollbar-thumb-pink-300::-webkit-scrollbar-thumb { background: #f9a8d4; border-radius: 8px; }
         .scrollbar-track-purple-100::-webkit-scrollbar-track { background: #f3e8ff; border-radius: 8px; }
         html, body, #__next { height: 100%; width: 100%; margin: 0; padding: 0; }
+        
+        /* Enhanced markdown styling */
+        .markdown-message h1, .markdown-message h2, .markdown-message h3 {
+          scroll-margin-top: 1rem;
+        }
+        .markdown-message p:last-child {
+          margin-bottom: 0;
+        }
+        .markdown-message pre {
+          font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+        }
+        .markdown-message :not(pre) > code {
+          font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+        }
+        
+        /* Syntax highlighting theme - GitHub Dark */
+        .hljs {
+          background: #0d1117 !important;
+          color: #c9d1d9 !important;
+          border-radius: 8px;
+          padding: 1rem;
+        }
+        .hljs-keyword { color: #ff7b72; }
+        .hljs-string { color: #a5d6ff; }
+        .hljs-comment { color: #8b949e; }
+        .hljs-number { color: #79c0ff; }
+        .hljs-function { color: #d2a8ff; }
+        .hljs-variable { color: #ffa657; }
+        .hljs-title { color: #7ee787; }
+        .hljs-attr { color: #79c0ff; }
+        .hljs-built_in { color: #ffa657; }
       `}</style>
     </div>
   );
