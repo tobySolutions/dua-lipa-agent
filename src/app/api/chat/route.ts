@@ -8,8 +8,8 @@ export async function POST(req: NextRequest) {
   const { messages } = await req.json();
 
   const openai = createOpenAI({
-    baseURL: "https://0x29fdec2147d7ab5558e227f114b6928a9b611ce0.gaia.domains/v1",
-    apiKey: "gaia",
+    baseURL: process.env.GAIA_BASE_URL,
+    apiKey: process.env.GAIA_API_KEY,
   });
 
   const result = await streamText({
