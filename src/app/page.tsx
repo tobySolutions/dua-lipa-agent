@@ -14,7 +14,7 @@ export default function Home() {
   const [hunger, setHunger] = useState(70);
   const [happiness, setHappiness] = useState(80);
   const [energy, setEnergy] = useState(60);
-  const [message, setMessage] = useState("Welcome to Dua Lipa Agent!");
+  const [message, setMessage] = useState("Hey, it's Dua Lipa!");
   const [chatInput, setChatInput] = useState("");
   const [isNapping, setIsNapping] = useState(false);
   const [chatMessages, setChatMessages] = useState<{ role: string; content: string; face?: boolean }[]>([]);
