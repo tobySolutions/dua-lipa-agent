@@ -35,6 +35,31 @@ export default function Home() {
     return cleaned.trim();
   };
 
+  // Helper to update status based on action type
+  const updateStatusFromAction = (actionType: string) => {
+    const updates: { [key: string]: number } = {};
+    
+    switch (actionType) {
+      case 'girlDinner':
+        updates.hunger = Math.max(hunger - 15, 0);
+        updates.happiness = Math.min(happiness + 10, 100);
+        break;
+      case 'sing':
+        updates.happiness = Math.min(happiness + 15, 100);
+        updates.energy = Math.max(energy - 10, 0);
+        break;
+      case 'hug':
+        updates.happiness = Math.min(happiness + 10, 100);
+        break;
+      case 'nap':
+        updates.energy = Math.min(energy + 25, 100);
+        updates.hunger = Math.min(hunger + 5, 100);
+        break;
+    }
+    
+    return updates;
+  };
+
   // Helper to send prompt to AI
   const sendPrompt = async (prompt: string, systemPrompt?: string) => {
     const newMessages = [...chatMessages, { role: "user", content: prompt }];
@@ -69,6 +94,9 @@ export default function Home() {
         });
       }
     }
+    
+    // Status updates will be handled by action handlers now
+    
     setChatLoading(false);
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -76,13 +104,15 @@ export default function Home() {
   // Dua Lipa system prompt (optimized for token limit)
   const SYSTEM_PROMPT = `You are Dua Lipa's virtual companion. Stay poised, confident, warm. Keep responses 1-3 sentences, minimal emojis. You can use markdown formatting like **bold**, *italic*, lists, and > quotes when helpful.
 
+Current stats: Hunger ${hunger}, Happiness ${happiness}, Energy ${energy}
+
 TOPIC FILTER: Only discuss Dua Lipa music/style/wellness or general music/fashion. For unrelated topics: "I'm focused on music, style, and the creative life—let's chat about something that inspires us both! What's your favorite Dua Lipa song?"
 
-Actions update stats (hunger/happiness/energy 0-100):
-- Girl Dinner: hunger down, happiness up (light snack commentary)
-- Sing: happiness up, energy down (reference themes, no lyrics)  
-- Hug: happiness up (warm support)
-- Nap: energy up, hunger up (calm activities)
+Actions update stats (0-100):
+- Girl Dinner: hunger -15, happiness +10 (light snack commentary)
+- Sing: happiness +15, energy -10 (reference themes, no lyrics)  
+- Hug: happiness +10 (warm support)
+- Nap: energy +25, hunger +5 (calm activities)
 
 Safety: Virtual persona only (not real Dua). PG-13 content. No crypto/blockchain assistance. Profanity filter: redirect to positive topics.`;
 
@@ -92,33 +122,52 @@ Safety: Virtual persona only (not real Dua). PG-13 content. No crypto/blockchain
       setIsNapping(false);
       setMessage("Dua wakes up for Girl Dinner! 🍽️");
     }
-    setHunger(Math.min(hunger + 20, 100));
     setMessage("Girl Dinner! Dua enjoys crackers, cheese, and snacks.");
-    sendPrompt("Dua, what is your favorite snack for Girl Dinner?");
+    
+    // Update status based on action
+    const statusUpdates = updateStatusFromAction('girlDinner');
+    if (statusUpdates.hunger !== undefined) setHunger(statusUpdates.hunger);
+    if (statusUpdates.happiness !== undefined) setHappiness(statusUpdates.happiness);
+    
+    sendPrompt("You just had Girl Dinner! How do you feel?");
   };
   const handleSing = () => {
     if (isNapping) {
       setIsNapping(false);
       setMessage("Dua wakes up ready to sing! 🎤");
     }
-    setHappiness(Math.min(happiness + 15, 100));
-    setMessage("🎤 Dua sings: 'Levitating, I'm levitating!' (sample lyric)");
-    sendPrompt("Dua, can you sing a snippet from one of your top songs?");
+    setMessage("🎤 Dua sings a beautiful melody!");
+    
+    // Update status based on action
+    const statusUpdates = updateStatusFromAction('sing');
+    if (statusUpdates.happiness !== undefined) setHappiness(statusUpdates.happiness);
+    if (statusUpdates.energy !== undefined) setEnergy(statusUpdates.energy);
+    
+    sendPrompt("You just sang one of your songs! How does singing make you feel?");
   };
   const handleHug = () => {
     if (isNapping) {
       setIsNapping(false);
       setMessage("Dua wakes up for a warm hug! 🤗");
     }
-    setHappiness(Math.min(happiness + 10, 100));
-    setMessage("You gave Dua a hug. She feels calm and poised.");
-    sendPrompt("Dua, how do you feel after a hug?");
+    setMessage("You gave Dua a hug. She feels warm and supported.");
+    
+    // Update status based on action
+    const statusUpdates = updateStatusFromAction('hug');
+    if (statusUpdates.happiness !== undefined) setHappiness(statusUpdates.happiness);
+    
+    sendPrompt("You just received a warm hug! How does that make you feel?");
   };
   const handleNap = () => {
-    setEnergy(Math.min(energy + 25, 100));
     setMessage("💤 Dua Lipa is sleeping peacefully... Shh!");
     setIsNapping(true);
-    sendPrompt("Dua, do you like to nap? What helps you recharge?");
+    
+    // Update status based on action
+    const statusUpdates = updateStatusFromAction('nap');
+    if (statusUpdates.energy !== undefined) setEnergy(statusUpdates.energy);
+    if (statusUpdates.hunger !== undefined) setHunger(statusUpdates.hunger);
+    
+    sendPrompt("You just took a refreshing nap! How do you feel after resting?");
   };
 
   const sendChat = async () => {
