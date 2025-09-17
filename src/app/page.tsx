@@ -204,6 +204,14 @@ Output format:
                 </h2>
                 <div className="flex-1 flex flex-col-reverse overflow-y-scroll px-2 sm:px-6 md:px-8 mb-0 scrollbar-thin scrollbar-thumb-pink-300 scrollbar-track-purple-100 pb-[80px]" style={{ minHeight: '0', maxHeight: '260px' }}>
                   <div>
+                    {chatLoading && (
+                      <div className="flex items-center gap-2 mb-3 animate-fade-in">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 relative rounded-full overflow-hidden border-2 border-purple-400 bg-white flex items-center justify-center shadow-lg">
+                          <Image src="/dua_lipa.png" alt="Dua Lipa tiny face" fill sizes="32px,40px" className="object-cover" />
+                        </div>
+                        <span className="text-purple-700 font-semibold text-base sm:text-lg animate-pulse">Dua Lipa is typing...</span>
+                      </div>
+                    )}
                     {chatMessages.map((msg, i) => (
                       <div key={i} className={`p-3 sm:p-4 rounded-2xl flex items-center gap-2 sm:gap-4 mb-2 sm:mb-3 transition-all duration-300 ${msg.role === "user" ? "bg-gradient-to-r from-pink-100 to-pink-200 justify-end" : "bg-gradient-to-r from-purple-50 to-indigo-100 justify-start"} shadow-lg animate-fade-in`}> 
                         {msg.role === "assistant" ? (
