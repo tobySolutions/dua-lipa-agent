@@ -15,11 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Dua Lipa Agent",
   description: "A Dua Lipa-themed mobile-first web app demo.",
-  icons: {
-    icon: '/dua_lipa.png',
-    shortcut: '/dua_lipa.png',
-    apple: '/dua_lipa.png',
-  },
 };
 
 export default function RootLayout({

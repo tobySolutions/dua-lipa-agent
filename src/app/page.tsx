@@ -178,7 +178,7 @@ Safety: Virtual persona only (not real Dua). PG-13 content. No crypto/blockchain
   };
 
   return (
-    <div className="font-sans min-h-screen min-w-screen w-screen h-screen flex flex-col items-stretch justify-stretch relative overflow-hidden bg-gradient-to-br from-purple-900 via-pink-400 to-indigo-900">
+    <div className="font-sans min-h-screen w-full flex flex-col items-stretch justify-stretch relative bg-gradient-to-br from-purple-900 via-pink-400 to-indigo-900">
       <Image
         src="/dua_lipa_2.jpeg"
         alt="Dua Lipa background"
@@ -186,10 +186,10 @@ Safety: Virtual persona only (not real Dua). PG-13 content. No crypto/blockchain
         className="object-cover z-0 opacity-40 blur-md scale-105 transition-all duration-700"
         priority
       />
-      <main className="flex-1 w-full h-full flex flex-col gap-0 items-stretch justify-stretch z-10 px-0 py-0">
-        <div className="absolute inset-0 flex flex-col items-stretch justify-stretch">
+      <main className="flex-1 w-full flex flex-col gap-0 items-stretch justify-stretch z-10 px-0 py-0 min-h-screen">
+        <div className="flex-1 flex flex-col items-stretch justify-stretch">
           <div className="flex-1 flex flex-col items-stretch justify-stretch">
-            <div className="shadow-2xl bg-white/80 flex-1 flex flex-col items-center justify-start rounded-none backdrop-blur-2xl border-t-8 border-pink-400 w-full h-full transition-all duration-500 px-2 sm:px-6 md:px-12 lg:px-24">
+            <div className="shadow-2xl bg-white/80 flex-1 flex flex-col items-center justify-start rounded-none backdrop-blur-2xl border-t-8 border-pink-400 w-full transition-all duration-500 px-2 sm:px-6 md:px-12 lg:px-24 py-6 sm:py-8">
               <div className="w-24 h-24 sm:w-28 sm:h-28 mt-6 sm:mt-10 mb-4 sm:mb-6 relative rounded-full overflow-hidden border-4 border-purple-400 bg-white flex items-center justify-center shadow-2xl animate-bounce-slow mx-auto">
                 <Image
                   src="/dua_lipa.png"
@@ -242,15 +242,15 @@ Safety: Virtual persona only (not real Dua). PG-13 content. No crypto/blockchain
                 </button>
               </div>
               {/* Chat feature */}
-              <div className="shadow-2xl bg-white/95 w-full flex flex-col rounded-3xl backdrop-blur-lg flex-1 overflow-hidden border border-purple-200 animate-fade-in relative" style={{ maxHeight: '420px', minHeight: '320px' }}>
+              <div className="shadow-2xl bg-white/95 w-full flex flex-col rounded-3xl backdrop-blur-lg border border-purple-200 animate-fade-in" style={{ minHeight: '600px', height: '600px' }}>
                 <h2 className="font-bold text-base sm:text-lg md:text-2xl mb-2 sm:mb-4 text-purple-700 flex items-center gap-2 sm:gap-3 px-2 sm:px-6 md:px-8 pt-2 sm:pt-6 drop-shadow-lg">
                   <span>Chat with Dua Lipa</span>
                   <FaRegSmile className="text-pink-500" />
                 </h2>
-                <div className="flex-1 flex flex-col-reverse overflow-y-scroll px-2 sm:px-6 md:px-8 mb-0 scrollbar-thin scrollbar-thumb-pink-300 scrollbar-track-purple-100 pb-[80px]" style={{ minHeight: '0', maxHeight: '260px' }}>
+                <div className="flex-1 flex flex-col-reverse overflow-y-auto px-4 sm:px-6 md:px-8 py-4 scrollbar-thin scrollbar-thumb-pink-300 scrollbar-track-purple-100">
                   <div>
                     {chatMessages.map((msg, i) => (
-                      <div key={i} className={`p-3 sm:p-4 rounded-2xl flex items-start gap-2 sm:gap-4 mb-2 sm:mb-3 transition-all duration-300 ${msg.role === "user" ? "bg-gradient-to-r from-pink-100 to-pink-200 flex-row-reverse ml-auto" : "bg-gradient-to-r from-purple-50 to-indigo-100 justify-start"} shadow-lg animate-fade-in`}> 
+                      <div key={i} className={`p-4 sm:p-6 rounded-2xl flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6 transition-all duration-300 ${msg.role === "user" ? "bg-gradient-to-r from-pink-100 to-pink-200 flex-row-reverse ml-auto max-w-[85%]" : "bg-gradient-to-r from-purple-50 to-indigo-100 justify-start max-w-[85%]"} shadow-lg animate-fade-in`}> 
                         {msg.role === "assistant" ? (
                           <div className="w-8 h-8 sm:w-10 sm:h-10 relative rounded-full overflow-hidden border-2 border-purple-400 bg-white flex items-center justify-center shadow-lg mt-1 flex-shrink-0">
                             <Image src="/dua_lipa.png" alt="Dua Lipa tiny face" fill sizes="32px,40px" className="object-cover" />
@@ -258,7 +258,7 @@ Safety: Virtual persona only (not real Dua). PG-13 content. No crypto/blockchain
                         ) : (
                           <FaRegSmile className="text-pink-500 w-7 h-7 sm:w-8 sm:h-8 mt-1 flex-shrink-0" />
                         )}
-                        <div className="text-sm sm:text-base text-purple-900 max-w-[70%] markdown-message font-medium animate-fade-in">
+                        <div className="text-base sm:text-lg text-purple-900 flex-1 markdown-message font-medium animate-fade-in">
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm, remarkBreaks]}
                             rehypePlugins={[rehypeHighlight, rehypeRaw]}
@@ -295,8 +295,8 @@ Safety: Virtual persona only (not real Dua). PG-13 content. No crypto/blockchain
                       </div>
                     ))}
                     {chatLoading && (
-                      <div className="flex items-center gap-2 mb-3 animate-fade-in">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 relative rounded-full overflow-hidden border-2 border-purple-400 bg-white flex items-center justify-center shadow-lg">
+                      <div className="flex items-center gap-3 mb-6 animate-fade-in p-4 rounded-2xl bg-gradient-to-r from-purple-50 to-indigo-100 shadow-lg max-w-[85%]">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 relative rounded-full overflow-hidden border-2 border-purple-400 bg-white flex items-center justify-center shadow-lg mt-1 flex-shrink-0">
                           <Image src="/dua_lipa.png" alt="Dua Lipa tiny face" fill sizes="32px,40px" className="object-cover" />
                         </div>
                         <span className="text-purple-700 font-semibold text-base sm:text-lg animate-pulse">Dua Lipa is typing...</span>
@@ -305,25 +305,29 @@ Safety: Virtual persona only (not real Dua). PG-13 content. No crypto/blockchain
                     <div ref={chatEndRef} />
                   </div>
                 </div>
-                <form className="absolute bottom-0 left-0 right-0 bg-white/95 flex gap-2 sm:gap-4 px-2 sm:px-6 md:px-8 pb-2 sm:pb-6 pt-2 z-20 border-t border-purple-100" style={{ boxShadow: '0 -2px 16px 0 rgba(236, 72, 153, 0.08)' }} onSubmit={e => { e.preventDefault(); sendChat(); }}>
-                  <input
-                    className={`flex-1 rounded-2xl border-2 border-purple-300 px-2 sm:px-5 py-2 sm:py-4 text-sm sm:text-lg focus:outline-none text-purple-900 shadow-lg font-medium transition-all duration-200 focus:ring-4 focus:ring-purple-200 ${isNapping ? 'bg-gray-200 cursor-not-allowed' : 'bg-purple-50'}`}
-                    type="text"
-                    placeholder={isNapping ? "Dua is napping... Shh!" : "Ask Dua Lipa anything..."}
-                    value={chatInput}
-                    onChange={e => setChatInput(e.target.value)}
-                    disabled={chatLoading || isNapping}
-                  />
-                  <button
-                    className={`rounded-2xl text-white px-3 sm:px-8 py-2 sm:py-4 font-bold shadow-xl text-sm sm:text-xl border-2 transition-all duration-200 ${isNapping ? 'bg-gray-400 border-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-pink-500 to-pink-400 border-pink-300 hover:scale-105 hover:bg-pink-600 focus:ring-4 focus:ring-pink-200'}`}
-                    type="submit"
-                    disabled={chatLoading || !chatInput.trim() || isNapping}
-                  >{isNapping ? "💤" : "Send"}</button>
-                </form>
+                <div className="flex gap-2 sm:gap-4 px-4 sm:px-6 md:px-8 pb-6 sm:pb-8 pt-4 sm:pt-6 bg-white/95 border-t border-purple-100 rounded-b-3xl" style={{ boxShadow: '0 -2px 16px 0 rgba(236, 72, 153, 0.08)' }}>
+                  <form className="flex gap-2 sm:gap-4 w-full" onSubmit={e => { e.preventDefault(); sendChat(); }}>
+                    <input
+                      className={`flex-1 rounded-2xl border-2 border-purple-300 px-4 sm:px-6 py-3 sm:py-5 text-base sm:text-lg focus:outline-none text-purple-900 shadow-lg font-medium transition-all duration-200 focus:ring-4 focus:ring-purple-200 ${isNapping ? 'bg-gray-200 cursor-not-allowed' : 'bg-purple-50'}`}
+                      type="text"
+                      placeholder={isNapping ? "Dua is napping... Shh!" : "Ask Dua Lipa anything..."}
+                      value={chatInput}
+                      onChange={e => setChatInput(e.target.value)}
+                      disabled={chatLoading || isNapping}
+                    />
+                    <button
+                      className={`rounded-2xl text-white px-4 sm:px-8 py-3 sm:py-5 font-bold shadow-xl text-base sm:text-xl border-2 transition-all duration-200 ${isNapping ? 'bg-gray-400 border-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-pink-500 to-pink-400 border-pink-300 hover:scale-105 hover:bg-pink-600 focus:ring-4 focus:ring-pink-200'}`}
+                      type="submit"
+                      disabled={chatLoading || !chatInput.trim() || isNapping}
+                    >{isNapping ? "💤" : "Send"}</button>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        {/* Bottom spacing for better scrolling */}
+        <div className="h-16 sm:h-20"></div>
       </main>
       <style jsx global>{`
         .animate-fade-in { animation: fadeIn 0.7s ease; }
@@ -331,8 +335,10 @@ Safety: Virtual persona only (not real Dua). PG-13 content. No crypto/blockchain
         .animate-bounce-slow { animation: bounceSlow 2.5s infinite; }
         @keyframes bounceSlow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         .scrollbar-thin { scrollbar-width: thin; }
+        .scrollbar-thin::-webkit-scrollbar { width: 8px; }
         .scrollbar-thumb-pink-300::-webkit-scrollbar-thumb { background: #f9a8d4; border-radius: 8px; }
         .scrollbar-track-purple-100::-webkit-scrollbar-track { background: #f3e8ff; border-radius: 8px; }
+        .scrollbar-thumb-pink-300::-webkit-scrollbar-thumb:hover { background: #f472b6; }
         html, body, #__next { height: 100%; width: 100%; margin: 0; padding: 0; }
         
         /* Enhanced markdown styling */
