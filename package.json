@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.31",
+    "@vercel/analytics": "^1.5.0",
     "ai": "^5.0.45",
     "highlight.js": "^11.11.1",
     "next": "15.5.3",
